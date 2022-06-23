@@ -1,0 +1,35 @@
+@api_view(["POST"])
+##The logged in faculty member can search a particular topic from the list of his own uploaded topics
+def search_suggested_topic_faculty(request):
+    try:
+        if request.session["token"]:
+            fac_id=request.session["id"]
+    except:
+        return Response({"message":"User not logged in"},status=status.HTTP_401_UNAUTHORIZED)
+    topic=request.data.get("topic")
+    words=topic.split(" ")
+    result=[]
+
+    for i in range(len(words)):
+        if words[i]!=" ":
+            query=Suggested_topics.objects.filter(Q(topic__icontains=words[i].title()))
+            if query:
+                result.extend(query)
+    
+    topics=[]
+    for j in range(len(result)):
+            output=[{"id":output.id,"topic":output.topic,"description":output.description,"faculty_id":output.faculty_id}
+            for output in Suggested_topics.objects.filter(id=result[j].id)]
+            
+            if output[0] not in topics and output[0].get("faculty_id").faculty_id==fac_id:
+                topics.extend(output)
+                output.clear()
+            else:
+                output.clear()
+    for i in range(len(topics)):
+        topics[i].pop("faculty_id")
+        
+    return Response({"topics":topics},status=status.HTTP_200_OK)
+
+url:
+ path("search-suggested-topic/",search_suggested_topic_faculty)

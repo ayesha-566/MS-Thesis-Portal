@@ -1,0 +1,78 @@
+import React, {Component} from "react";
+import "./SearchFields.css"
+import axios from 'axios'
+
+
+var output=[]
+class SearchFields extends Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+          rollno: "",
+          student: "",
+          advisor:"",
+          year:"",
+          topic:"",
+          
+        };
+    
+        this.handleChange = this.handleChange.bind(this);
+      //  this.handleSubmit = this.handleSubmit.bind(this);
+      }
+    
+      handleChange(event) {
+        const target = event.target;
+        const value = target.type === "checkbox" ? target.checked : target.value;
+        const name = target.name;
+    
+        this.setState({
+          [name]: value
+        });
+      }
+   
+    
+      Search=event=>{
+        console.log(this.state)
+        let data
+        axios.post("http://localhost:8000/search/",{
+          rollno: this.state.rollno,
+          student: this.state.student,
+          advisor:this.state.advisor,
+          year:this.state.year,
+          topic:this.state.topic,
+          domain:this.state.domain,
+          
+
+        }) .then(response => {
+          data=response.data
+          console.log(data)
+          
+          //console.log(response.data);
+         // this.setState({output:response.data});
+        })
+        
+    }
+    render(){
+        return(
+            <div class="marginTopLeft">
+                <input name="rollno" placeholder="Roll Number" class="inputShape inputSmall" value={this.state.rollno} onChange={this.handleChange}></input>
+                <input name="student" placeholder="Student" class="inputShape inputSmall" value={this.state.student} onChange={this.handleChange}></input>
+                <input name="advisor" placeholder="Advisor" class="inputShape inputSmall" value={this.state.advisor} onChange={this.handleChange}></input>
+                <input name="year" placeholder="Year" class="inputShape inputSmall" value={this.state.year} onChange={this.handleChange}></input>
+                <input name="domain" placeholder="Domain" class="inputShape inputSmall" value={this.state.domain} onChange={this.handleChange}></input>
+                <input name="topic" placeholder="Topic" class="inputShape inputLarge" value={this.state.topic} onChange={this.handleChange}></input>
+                <button type="submit" onClick={this.Search} class="buttonColor buttonShape"><i class="fa fa-search iconColor"></i></button>
+        <div>
+          <br></br>
+          <br></br>
+        
+        </div>
+            </div>
+            
+        );
+    }
+}
+
+export default SearchFields;
+
+
